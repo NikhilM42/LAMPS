@@ -25,7 +25,7 @@ class node:
         else:
             variableisA = 0
 
-    def setFType(t):
+    def setFunctionType(t):
         if t>2 :
             t = round(t/10.0)
         functiontype = t
