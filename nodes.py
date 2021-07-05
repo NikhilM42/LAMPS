@@ -1,6 +1,32 @@
+
 class node:
-    functiontype = 1
-    function = 1
+    ##operations dictionary
+    transformer = {
+        '1': lambda a: math.sin(a),
+        '2': lambda a: math.cos(a),
+        '3': lambda a: abs(a),
+        '4': lambda a: math.log2(abs(a)),
+        '5': lambda a: math.log10(abs(a)),
+        '6': lambda a: math.exp(a)
+        }[value](a)
+
+    combiner = {
+        '1': lambda a,b: a-b,
+        '2': lambda a,b: a+b,
+        '3': lambda a,b: a*b,
+        '4': lambda a,b: a/b,
+        '5': lambda a,b: a**b,
+        '6': lambda a,b: a%b,
+        '7': lambda a,b: math.log(abs(a),abs(b))
+        }[value](a,b)
+
+    operationTypes = {
+        '1': transformer,
+        '2': combiner
+        }
+
+    operationtype = 1
+    operation = 1
     inputA = 0
     locA = []
     variableisA = 0
@@ -9,32 +35,46 @@ class node:
     variableisB = 0
     outputY = 0
 
-    def __init__(self, c=1,d=1,a=0, b=0):
-        self.inputA = a
-        self.inputB = b
-        self.functiontype = c
-        self.function = d
+    def __init__(self, opType=1,op=1,varA=0, varB=0):
+        self.inputA = varA
+        self.inputB = varB
+        self.operationType = opType
+        self.operation = op
 
-        if b == 'x':
-            variableisB = 1
+        if varB == 'x':
+            self.variableisB = 1
         else:
-            variableisB = 0
+            self.variableisB = 0
             
-        if a == 'x':
-            variableisA = 1
+        if varA == 'x':
+            self.variableisA = 1
         else:
-            variableisA = 0
+            self.variableisA = 0
+    
+    def __init__(self, row,col):
 
-    def setFunctionType(t):
-        if t>2 :
-            t = round(t/10.0)
-        functiontype = t
+        self.operationType = int(random()*1000)%2+1
 
-##    def replaceX(self,val):
-##        if self.inputA=='x':
-##            self.inputA = val
-##        elif self.inputB=='x':
-##            self.inputB = val
+        randrow = int(random()*1000)%row
+        randcol = int(random()*1000)%col
+
+        self.inputA = [randrow,randcol]
+        
+        if self.operationType==1:
+            self.operation = int(random()*1000)%6+1
+        else:
+            self.operation = int(random()*1000)%7+1
+            randrow = int(random()*1000)%row
+            randcol = int(random()*1000)%col
+            self.inputB = [randrow,randcol]
+
+        self.variableisB = 0
+        self.variableisA = 0
+
+    def setOperationType(opType):
+        if opType>2 : 
+            opType = round(opType/10.0)
+        operationType = opType
 
     def calculate(selffunction,xval):
         if self.inputA == 'x':
@@ -46,3 +86,9 @@ class node:
             self.inputB = selffunction[locB[0]][locB[1]].calculate(selffunction,xval)
         else:
             self.inputB = xval
+    
+##    def replaceX(self,val):
+##        if self.inputA=='x':
+##            self.inputA = val
+##        elif self.inputB=='x':
+##            self.inputB = val

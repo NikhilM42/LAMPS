@@ -1,6 +1,4 @@
 import math
-from random import seed
-from random import random
 import pandas as pd
 
 from .functions import function
@@ -17,6 +15,7 @@ from .functions import function
     #event id
 
 def pulldata():
+    return 0
     
 def main():
     popCount = 40
@@ -25,13 +24,13 @@ def main():
     populationoutput = []
     
     for citizen in range(popCount):
-        population.append(generatefunction())
+        population.append(function)
 
     data = pd.read_csv("DATA_CM.csv")
     
     for citizen in range(popCount):
         for datapoint in data:
-            result = calculatefunction(citizen,datapoint['Number'])
+            result = population[citizen].calculatefunction(datapoint['Number'])
 
 if __name__ == "__main__":
     main()
