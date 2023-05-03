@@ -56,14 +56,14 @@ class node:
             self.operation = int(random()*1000) % TRANSFORM_COUNT+1
         else:
             self.operation = int(random()*1000) % COMBINER_COUNT+1
-            self.inputB = self.randomlyCreateValueOrVariable()
+            self.inputB = self.randomly_create_value_or_variable()
 
             if self.inputB == 'x':
                 self.variable_is_B = 1
             else:
                 self.variable_is_B = 0
 
-    def randomlyCreateValueOrVariable(self):
+    def randomly_create_value_or_variable(self):
         randVar = int(random()*1000) % 3
 
         if randVar == 0:
@@ -71,7 +71,7 @@ class node:
         else:
             return int(random()*1000) + 1
 
-    def setOperationType(self, opType):
+    def set_operation_type(self, opType):
         if opType not in self.operation_types.keys():
             return
 
@@ -142,3 +142,5 @@ class node:
             if input_value_a == 0:
                 input_value_b += 0.1
             return math.log(math.abs(input_value_a), input_value_b)
+        else:
+            raise ValueError(function_index)
