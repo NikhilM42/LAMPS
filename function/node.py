@@ -4,6 +4,31 @@ from random import random
 TRANSFORM_COUNT = 12
 COMBINER_COUNT = 8
 
+TRANSFORMER_OPS = {
+    "NOTHING": 0,
+    "SIN": 1,
+    "COS": 2,
+    "TAN": 3,
+    "ASIN": 4,
+    "ACOS": 5,
+    "ATAN": 6,
+    "SQRT": 7,
+    "LOG_E": 8,
+    "LOG_10": 9,
+    "ABS": 10,
+    "EXP": 11,
+}
+
+COMBINER_OPS = {
+    "ADD": 0,
+    "SUBTRACT": 1,
+    "MULTIPLY": 2,
+    "DIVIDE": 3,
+    "POWER": 4,
+    "MODULO": 5,
+    "LOG_WITH_BASE": 6,
+}
+
 class node:
     operation_type = 1
     operation = 1
@@ -17,17 +42,17 @@ class node:
         if opType == 0:
             self.build_random_node()
         else:
-            self.build_node(opType, op, varA, varB)    
-    
+            self.build_node(opType, op, varA, varB)
+
     def build_node(self, opType: int, op: int, varA, varB):
         # guard against bad values for opType
         if opType < 0 or opType > 1:
             return
-        
+
         # guard against bad values for op
         if (opType == 0 and (op < 0 or op >= TRANSFORM_COUNT)) or (opType == 1 and (op < 0 or op >= COMBINER_COUNT)):
             return
-        
+
         self.inputA = varA
         self.inputB = varB
         self.operation_type = opType
@@ -91,10 +116,11 @@ class node:
         if self.operation_type == 0:
             self.outputY = node._transform(self.operation, self.outputY)
         else:
-            self.outputY = node._combine(self.operation, variable_a, variable_b)
-        
+            self.outputY = node._combine(
+                self.operation, variable_a, variable_b)
+
         return self.outputY
-    
+
     def _transform(function_index: int, input_value: float | int) -> float:
         if function_index == 0:
             return input_value

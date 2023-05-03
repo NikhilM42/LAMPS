@@ -1,12 +1,10 @@
 import unittest
-from .node import node
-from .node import COMBINER_COUNT
+from node import node, COMBINER_COUNT, TRANSFORMER_OPS, COMBINER_OPS
 
 # unit test for node
 class TestNodeMethods(unittest.TestCase):
     def test_build_node(self):
         print("test_build_node")
-
     
     def test_build_random_node(self):
         print("test_build_random_node")
@@ -32,8 +30,18 @@ class TestNodeMethods(unittest.TestCase):
         # a function_index value greater than the number of functions should raise a ValueError
         with self.assertRaises(ValueError):
             result = node._combine(COMBINER_COUNT,1,1)
-        
-
+        # a function_index value of 0 will add input_value_a with input_value_b
+        result = node._combine(COMBINER_OPS['ADD'], 1, 1)
+        self.assertEqual(result, 2)
+        # a function_index value of 1 will subtract input_value_b from input_value_a
+        result = node._combine(COMBINER_OPS['SUBTRACT'], 2, 1)
+        self.assertEqual(result, 1)
+        # a function_index value of 2 will multiply input_value_a with input_value_b
+        result = node._combine(COMBINER_OPS['MULTIPLY'], 2, 2)
+        self.assertEqual(result, 4)
+        # a function_index value of 3 will divide input_value_a by input_value_b
+        result = node._combine(COMBINER_OPS['DIVIDE'], 4, 2)
+        self.assertEqual(result, 2)
 
 if __name__ == '__main__':
     unittest.main()
