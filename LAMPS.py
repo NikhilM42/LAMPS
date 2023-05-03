@@ -1,7 +1,8 @@
-import math
 import pandas as pd
+import requests
+import plotly.express as px
 
-from .functions import function
+from function.function import function
 
 #word scraper
     #where the hell do I pull this from?
@@ -16,22 +17,39 @@ from .functions import function
 
 def pulldata():
     return 0
+
+def getData():
+    headers = {
+        'Content-Type': 'application/json',
+        'x-api-key': '9606148177e148b49043fd12fa68299b'
+    }
+
+    r = requests.post('https://analyticsapi.tmxanalytics.com/v1/authn', headers = headers)
+
+    print(r.json())
     
 def main():
-    popCount = 40
-    generationlimit = 1000
-    population = []
-    populationoutput = []
+    population_count = 40
+    generation_limit = 1000
+    population: list[function] = []
+    population_output = []
     
-    for citizen in range(popCount):
-        population.append(function)
+    # generate population of new functions
+    for citizen_index in range(population_count):
+        population.append(function())
 
-    data = pd.read_csv("DATA_CM.csv")
+    dataFrame = pd.read_csv("DATA_CM.csv")
     
-    for citizen in range(popCount):
-        for datapoint in data:
-            result = population[citizen].calculatefunction(datapoint['Number'])
+    for citizen_index in range(population_count):
+        citizen: function = population[citizen_index]
+        population_output.append([])
+        for index, row in dataFrame.iterrows():
+            input_val: int = row['TSE:CM(open)']
+            result = citizen.calculate_function(input_val)
+            population_output[citizen_index].append(result)
+    
+    figure = px.line(population_output, x = 'Number', y = 'Result')
+    figure.show()
 
 if __name__ == "__main__":
     main()
-
