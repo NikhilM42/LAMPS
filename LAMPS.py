@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-import plotly.express as px
+import matplotlib.pyplot as plt
 
 from function.function import function
 
@@ -29,7 +29,7 @@ def getData():
     print(r.json())
     
 def main():
-    population_count = 40
+    population_count = 1000
     generation_limit = 1000
     population: list[function] = []
     population_output = []
@@ -37,19 +37,28 @@ def main():
     # generate population of new functions
     for citizen_index in range(population_count):
         population.append(function())
+        # population[citizen_index].print_function()
 
     dataFrame = pd.read_csv("DATA_CM.csv")
     
     for citizen_index in range(population_count):
         citizen: function = population[citizen_index]
-        population_output.append([])
-        for index, row in dataFrame.iterrows():
-            input_val: int = row['TSE:CM(open)']
-            result = citizen.calculate_function(input_val)
-            population_output[citizen_index].append(result)
+        citizen_result: list[int] = []
+        try:
+            citizen_result = dataFrame['TSE:CM(open)'].apply(citizen.calculate_function)
+            # for index, row in dataFrame.iterrows():
+            #     input_val: int = row['TSE:CM(open)']
+            #     result = citizen.calculate_function(input_val)
+            #     citizen_result.append(result)
+        except ValueError:
+            print("dropping a formula due to a value error")
+        # except:
+        #     print("dropping a formula due to an exception")
+        else:
+            population_output.append(citizen_result)
+            citizen_result.plot()
     
-    figure = px.line(population_output, x = 'Number', y = 'Result')
-    figure.show()
+    plt.show()
 
 if __name__ == "__main__":
     main()
