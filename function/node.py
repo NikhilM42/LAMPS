@@ -1,17 +1,17 @@
 import math
 from random import random
 
-TRANSFORM_COUNT = 7
-COMBINER_COUNT = 5
+TRANSFORM_COUNT = 6
+COMBINER_COUNT = 4
 
 TRANSFORMER_OPS = {
     "NOTHING": 0,
     "SIN": 1,
     "COS": 2,
-    "TAN": 3,
-    "SQRT": 4,
-    "ABS": 5,
-    "EXP": 6,
+    "SQRT": 3,
+    "ABS": 4,
+    "EXP": 5,
+    "TAN": 6,
     "LOG_E": 7,
     "LOG_10": 8,
     "ASIN": 9,
@@ -23,14 +23,23 @@ COMBINER_OPS = {
     "ADD": 0,
     "SUBTRACT": 1,
     "MULTIPLY": 2,
-    "DIVIDE": 3,
-    "POWER": 4,
+    "POWER": 3,
+    "DIVIDE": 4,
     "MODULO": 5,
     "LOG_WITH_BASE": 6,
 }
 
-TRANSFORMER = 1
-COMBINER = 2
+OPERATION_TYPES = {
+    "TRANSFORMER": 1,
+    "COMBINER": 2,
+}
+
+NODE_TYPES = {
+    "RANDOM": 0,
+    "RANDOM_ROOT": 1,
+    "CUSTOM": 2,
+}
+
 
 class node:
     operation_type = 1
@@ -41,19 +50,23 @@ class node:
     variable_is_B = 0
     outputY = 0
 
-    def __init__(self, opType=0, op=0, varA=0, varB=0):
-        if opType == 0:
+    def __init__(self, node_type=NODE_TYPES["RANDOM"], opType=0, op=0, varA=0, varB=0):
+        if node_type == NODE_TYPES["RANDOM"]:
             self.build_random_node()
+        elif node_type == NODE_TYPES["RANDOM_ROOT"]:
+            self.build_random_root_node()
+        elif node_type == NODE_TYPES["CUSTOM"]:
+            self.build_custom_node(opType, op, varA, varB)
         else:
-            self.build_node(opType, op, varA, varB)
+            raise ValueError("Invalid node type")
 
-    def build_node(self, opType: int, op: int, varA, varB):
+    def build_custom_node(self, opType: OPERATION_TYPES, op: int, varA, varB):
         # guard against bad values for opType
-        if opType < 1 or opType > 2:
+        if opType < OPERATION_TYPES["TRANSFORMER"] or opType > OPERATION_TYPES["COMBINER"]:
             return
 
         # guard against bad values for op
-        if (opType == 1 and (op < 0 or op >= TRANSFORM_COUNT)) or (opType != 1 and (op < 0 or op >= COMBINER_COUNT)):
+        if (opType == OPERATION_TYPES["TRANSFORMER"] and (op < 0 or op >= TRANSFORM_COUNT)) or (opType == OPERATION_TYPES["COMBINER"] and (op < 0 or op >= COMBINER_COUNT)):
             return
 
         self.inputA = varA
@@ -80,7 +93,7 @@ class node:
         else:
             self.variable_is_A = 0
 
-        if self.operation_type == 1:
+        if self.operation_type == OPERATION_TYPES["TRANSFORMER"]:
             self.operation = int(random()*1000) % TRANSFORM_COUNT
         else:
             self.operation = int(random()*1000) % COMBINER_COUNT
@@ -91,13 +104,16 @@ class node:
             else:
                 self.variable_is_B = 0
 
+    def build_random_root_node(self):
+        print("Not implemented yet")
+
     def randomly_create_value_or_variable(self):
         randVar = int(random()*1000) % 3
 
         if randVar == 0:
             return 'x'
         else:
-            return int(random()*1000) + 1
+            return int(random()*10) + 1
 
     def set_operation_type(self, opType):
         if opType not in self.operation_types.keys():
@@ -116,7 +132,7 @@ class node:
             variable_b = x_val
 
         # check the node's operation type and perform the appropriate calculation and store it
-        if self.operation_type == 0:
+        if self.operation_type == OPERATION_TYPES["TRANSFORMER"]:
             self.outputY = node._transform(self.operation, variable_a)
         else:
             self.outputY = node._combine(
@@ -125,59 +141,59 @@ class node:
         return self.outputY
 
     def _transform(function_index: int, input_value: float | int) -> float:
-        if function_index == 0:
+        if function_index == TRANSFORMER_OPS["NOTHING"]:
             return input_value
-        elif function_index == 1:
+        elif function_index == TRANSFORMER_OPS["SIN"]:
             return math.sin(input_value)
-        elif function_index == 2:
+        elif function_index == TRANSFORMER_OPS["COS"]:
             return math.cos(input_value)
-        elif function_index == 3:
+        elif function_index == TRANSFORMER_OPS["TAN"]:
             return math.tan(input_value)
-        elif function_index == 4:
+        elif function_index == TRANSFORMER_OPS["SQRT"]:
             return math.sqrt(input_value)
-        elif function_index == 5:
+        elif function_index == TRANSFORMER_OPS["ABS"]:
             return abs(input_value)
-        elif function_index == 6:
+        elif function_index == TRANSFORMER_OPS["EXP"]:
             return math.exp(input_value)
-        elif function_index == 7:
+        elif function_index == TRANSFORMER_OPS["LOG_E"]:
             if input_value == 0:
                 input_value += 0.1
             return math.log(abs(input_value))
-        elif function_index == 8:
+        elif function_index == TRANSFORMER_OPS["LOG_10"]:
             if input_value == 0:
                 input_value += 0.1
             return math.log10(math.abs(input_value))
-        elif function_index == 9:
+        elif function_index == TRANSFORMER_OPS["ASIN"]:
             # if input_value > 1 or input_value < -1:
             #     raise ValueError(input_value)
             return math.asin(input_value % 2 - 1)
-        elif function_index == 10:
+        elif function_index == TRANSFORMER_OPS["ACOS"]:
             # if input_value > 1 or input_value < -1:
             #     raise ValueError(input_value)
             return math.acos(input_value % 2 - 1)
-        elif function_index == 11:
+        elif function_index == TRANSFORMER_OPS["ATAN"]:
             return math.atan(input_value)
         else:
             raise ValueError(function_index)
 
     def _combine(function_index: int, input_value_a: float | int, input_value_b: float | int) -> float:
-        if function_index == 0:
+        if function_index == COMBINER_OPS["ADD"]:
             return input_value_a + input_value_b
-        elif function_index == 1:
+        elif function_index == COMBINER_OPS["SUBTRACT"]:
             return input_value_a - input_value_b
-        elif function_index == 2:
+        elif function_index == COMBINER_OPS["MULTIPLY"]:
             return input_value_a * input_value_b
-        elif function_index == 3:
+        elif function_index == COMBINER_OPS["DIVIDE"]:
             if input_value_b == 0:
                 raise ValueError("Cannot divide by zero")
             return input_value_a / input_value_b
-        elif function_index == 4:
+        elif function_index == COMBINER_OPS["POWER"]:
             return input_value_a ** input_value_b
-        elif function_index == 5:
+        elif function_index == COMBINER_OPS["MODULO"]:
             if input_value_b == 0:
                 raise ValueError("Cannot modulo by zero")
             return input_value_a % input_value_b
-        elif function_index == 6:
+        elif function_index == COMBINER_OPS["LOG"]:
             if input_value_a == 0:
                 raise ValueError("Cannot log with a base zero")
             return math.log(abs(input_value_a), input_value_b)
@@ -192,8 +208,6 @@ class node:
             print("sin(", self.inputA, ")", sep=' ', end=' ')
         elif self.operation == TRANSFORMER_OPS["COS"]:
             print("cos(", self.inputA, ")", sep=' ', end=' ')
-        elif self.operation == TRANSFORMER_OPS["TAN"]:
-            print("tan(", self.inputA, ")", sep=' ', end=' ')
         elif self.operation == TRANSFORMER_OPS["SQRT"]:
             print("sqrt(", self.inputA, ")", sep=' ', end=' ')
         elif self.operation == TRANSFORMER_OPS["ABS"]:
@@ -202,7 +216,7 @@ class node:
             print("exp(", self.inputA, ")", sep=' ', end=' ')
         else:
             print("unknown transformation function")
-    
+
     # prints the combiner equation
     def print_combine(self):
         if self.operation == COMBINER_OPS["ADD"]:
